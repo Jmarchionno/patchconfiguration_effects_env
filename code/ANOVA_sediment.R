@@ -1,14 +1,12 @@
 setwd("/Users/joe/Desktop/R_projects/CH3_Patchconfig/patchconfiguration_effects_env")
 
 ###Analysis of variance
-##is there a correlation between treatment type and TC,TIC,TN
+##Are there significant differences between treatment type and TC,TIC,TN
 
 library(tidyverse)
 library(ggplot2)
 
-TCdat<- read.csv('/Users/joe/Desktop/R_projects/CH3_Patchconfig/
-                 patchconfiguration_effects_env/data/
-                 Marchionno Final TC TIC results 6-18-25.csv')
+TCdat<- read.csv('/Users/joe/Desktop/R_projects/CH3_Patchconfig/patchconfiguration_effects_env/data/Marchionno Final TC TIC results 6-18-25.csv')
 
 ##plot treatment vs variables and run ANOVA
 ##treatment x TOC
@@ -58,3 +56,62 @@ ggplot(TCdat, aes(x=Treatment,y=wt..N)) +
 
 aov_TN <- aov(TCdat$wt..N ~ TCdat$Treatment)
 summary(aov_TN)
+
+######################################################
+###Are there differences between treatment type and grain size
+######################################################
+tex_dat <- read.csv('/Users/joe/Desktop/R_projects/CH3_Patchconfig/patchconfiguration_effects_env/data/Marchionno_Texture.csv')
+
+###################
+## treatment vs >6mm
+ggplot(tex_dat, aes(x=Treatment,y=fraction...6mm)) + 
+  geom_boxplot(outlier.shape = NA)+
+  geom_jitter()+
+  theme_minimal()+
+  ylab("fraction >6mm")
+
+#ANOVA treatment vs >6mm
+
+aov_T_6mm <- aov(tex_dat$fraction...6mm ~ tex_dat$Treatment)
+summary(aov_T_6mm)
+
+####################
+## treatment vs 2mm-6mm
+ggplot(tex_dat, aes(x=Treatment,y=fraction.2.6mm)) + 
+  geom_boxplot(outlier.shape = NA)+
+  geom_jitter()+
+  theme_minimal()+
+  ylab("fraction 2mm-6mm")
+
+#ANOVA treatment vs 2mm-6mm
+
+aov_T_2mm_6mm <- aov(tex_dat$fraction.2.6mm ~ tex_dat$Treatment)
+summary(aov_T_2mm_6mm)
+
+####################
+## treatment vs 0.063mm-2mm
+
+ggplot(tex_dat, aes(x=Treatment,y=fraction..063.2mm)) + 
+  geom_boxplot(outlier.shape = NA)+
+  geom_jitter()+
+  theme_minimal()+
+  ylab("fraction 0.063mm-2mm")
+
+#ANOVA treatment vs 0.063mm-2mm
+
+aov_T_.063mm_2mm <- aov(tex_dat$fraction..063.2mm ~ tex_dat$Treatment)
+summary(aov_T_.063mm_2mm)
+
+####################
+## treatment vs <0.063mm
+
+ggplot(tex_dat, aes(x=Treatment,y=fraction..0.063mm)) + 
+  geom_boxplot(outlier.shape = NA)+
+  geom_jitter()+
+  theme_minimal()+
+  ylab("fraction <0.063mm")
+
+#ANOVA treatment vs <0.063mm
+
+aov_T_.063mm <- aov(tex_dat$fraction..0.063mm ~ tex_dat$Treatment)
+summary(aov_T_.063mm)
