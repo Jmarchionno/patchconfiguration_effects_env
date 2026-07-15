@@ -1,4 +1,4 @@
-﻿Name,Treatment,Initial weight (g),>6mm w/ tray (g),2-6mm w/ tray (g),.063-2mm w/ tray (g),sum w/ tray (g),final >6mm (g),fraction > 6mm,final 2-6mm (g),fraction 2-6mm,final .063-2mm (g),fraction .063-2mm,sum (g) ,<0.063mm (g),fraction <0.063mm,fraction check
+﻿sampleID,Treatment,Initial weight (g),>6mm w/ tray (g),2-6mm w/ tray (g),.063-2mm w/ tray (g),sum w/ tray (g),final >6mm (g),fraction > 6mm,final 2-6mm (g),fraction 2-6mm,final .063-2mm (g),fraction .063-2mm,sum (g) ,<0.063mm (g),fraction <0.063mm,fraction check
 T01 Q2,h,157.88,63.62,30.7,40.66,134.98,59.19,0.37,26.27,0.17,36.23,0.23,121.69,36.19,0.23,1
 T01 Q3,h,95.73,46.29,17.15,25.96,89.4,41.86,0.44,12.72,0.13,21.53,0.22,76.11,19.62,0.2,1
 T02 Q1,c,117.17,44.29,15.38,34.4,94.07,39.86,0.34,10.95,0.09,29.97,0.26,80.78,36.39,0.31,1

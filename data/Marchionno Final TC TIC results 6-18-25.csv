@@ -1,4 +1,4 @@
-﻿Sample ID,Treatment,wt %N,wt %total C,Date,%CaCO3,%TIC,Date,wt %TOC by difference
+﻿sampleID,Treatment,wt %N,wt %total C,Date,%CaCO3,%TIC,Date,wt %TOC by difference
 T01 Q2,h,0.25,10.27,6-18-25am,73.1,8.77,6-18-25am,1.5
 T01 Q3,h,0.21,10.16,6-18-25am,72.63,8.72,6-18-25am,1.44
 T02 Q1,c,0.26,10.19,6-18-25am,68.11,8.17,6-18-25am,2.02

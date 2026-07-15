@@ -125,3 +125,15 @@ ggplot(tex_dat, aes(x=Treatment,y=fraction..0.063mm)) +
 aov_T_.063mm <- aov(tex_dat$fraction..0.063mm ~ tex_dat$Treatment)
 summary(aov_T_.063mm)
 
+#### read in oyster data ####
+
+oyster_dat <- read.csv('/Users/joe/Desktop/R_projects/CH3_Patchconfig/patchconfiguration_effects_env/data/oyster_data.csv')
+
+## plot treatment vs % cover
+
+ggplot(oyster_dat, aes(x=treatment,y=percent.cover)) +
+  geom_boxplot(outlier.shape = NA)+
+  geom_jitter()+
+  theme_minimal()+
+  ylab("percent cover")+
+  stat_compare_means()
