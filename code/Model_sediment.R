@@ -6,6 +6,8 @@ setwd("/Users/joe/Desktop/R_projects/CH3_Patchconfig/patchconfiguration_effects_
 library(tidyverse)
 library(ggplot2)
 library(ggpubr)
+library(vegan)
+library(readxl)
 
 TCdat<- read.csv('/Users/joe/Desktop/R_projects/CH3_Patchconfig/patchconfiguration_effects_env/data/Marchionno Final TC TIC results 6-18-25.csv')
 
@@ -137,3 +139,17 @@ ggplot(oyster_dat, aes(x=treatment,y=percent.cover)) +
   theme_minimal()+
   ylab("percent cover")+
   stat_compare_means()
+
+################################
+################################
+###PERMANOVA and NMDS
+#Create new dataframe
+
+perm_tex_dat<-tex_dat[, c(9,11,13,16)]
+
+#Run NMDS Model for Visualizing the composition
+
+nmds_result<-metaMDS (perm_tex_dat, distance = "bray")
+
+#Extract NMDS Scores 
+nmds_scores <-as.data.frame(scores(nmds_result)$sites)
