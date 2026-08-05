@@ -65,7 +65,7 @@ aov_TN <- aov(TCdat$wt..N ~ TCdat$Treatment)
 summary(aov_TN)
 
 ######################################################
-###Are there differences between treatment type and grain size
+###Are there differences between treatment type and sediment grain size
 ######################################################
 tex_dat <- read.csv('/Users/joe/Desktop/R_projects/CH3_Patchconfig/patchconfiguration_effects_env/data/Marchionno_Texture.csv')
 
@@ -200,3 +200,25 @@ ggplot(plot_NMDS_tex_data, aes(NMDS1,NMDS2)) +
                                      xend = xend, yend = yend, color = Treatment), alpha = 0.5)+
   scale_color_manual(name= "Treatment",labels= unique(plot_NMDS_tex_data$Treatment),
                      values= c("darkolivegreen", "darkviolet","darkorange1"))+ theme_bw()
+
+##############PERMANOVA##############################
+
+
+#Distance Matrix
+
+perm_tex_dist<-vegdist(perm_tex_dat, method='bray')
+
+#Assumptions
+
+dispersion<-betadisper(perm_tex_dist, group=tex_dat$Treatment,type = "centroid")
+
+plot(dispersion)
+
+anova(dispersion)
+
+#Test
+
+perma_result<-adonis2( perm_tex_dist~as.factor(plot_NMDS_tex_data$Treatment), data=perm_tex_dist,
+                       permutations=9999)
+
+perma_result
