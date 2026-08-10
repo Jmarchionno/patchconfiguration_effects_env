@@ -129,7 +129,7 @@ summary(aov_T_.063mm)
 
 #### read in oyster data ####
 
-oyster_dat <- read.csv('/Users/joe/Desktop/R_projects/CH3_Patchconfig/patchconfiguration_effects_env/data/oyster_data.csv')
+oyster_dat <- read.csv('/Users/joe/Desktop/R_projects/CH3_Patchconfig/patchconfiguration_effects_env/data/oyster_latlong_elevation.csv')
 
 ## plot treatment vs % cover
 
@@ -142,14 +142,97 @@ ggplot(oyster_dat, aes(x=treatment,y=percent.cover)) +
 
 ################################
 ################################
-###PERMANOVA and NMDS
+###PERMANOVA and NMDS for texture
 #Create new dataframe
 
 perm_tex_dat<-tex_dat[, c(9,11,13,16)]
 
 #Run NMDS Model for Visualizing the composition
 set.seed(123)
-nmds_result<-metaMDS (perm_tex_dat, distance = "bray")
+nmds_tex_result<-metaMDS (perm_tex_dat, distance = "bray")
+
+#Extract NMDS Scores 
+nmds_tex_scores <-as.data.frame(scores(nmds_tex_result)$sites)
+
+#Find out the centroids
+
+group_tex_centroids <- data.frame(
+  Treatment = c("h", "l","c"),
+  Centroid_X = c(mean(nmds_tex_scores$NMDS1[tex_dat$Treatment == "h"]),
+                mean(nmds_tex_scores$NMDS1[tex_dat$Treatment == "l"]),
+                 mean(nmds_tex_scores$NMDS1[tex_dat$Treatment == "c"])),
+  
+  Centroid_Y = c(mean(nmds_tex_scores$NMDS2[tex_dat$Treatment == "h"]),
+                 mean(nmds_tex_scores$NMDS2[tex_dat$Treatment == "l"]),
+                 mean(nmds_tex_scores$NMDS2[tex_dat$Treatment == "c"])))
+
+###Create data frame for ggplot
+
+#plot_NMDS_tex_data<-data.frame(Treatment = tex_dat$Treatment,
+  #NMDS1=nmds_scores$NMDS1,
+  #NMDS2=nmds_scores$NMDS2,
+  #xend=c(rep(group_centroids[1,2],10),rep(group_centroids[2,2],10)),
+  #yend=c(rep(group_centroids[1,3],10),rep( group_centroids[2,3],10)))
+
+plot_NMDS_tex_data <- data.frame(
+  Treatment = tex_dat$Treatment,
+  NMDS1 = nmds_tex_scores$NMDS1,
+  NMDS2 = nmds_tex_scores$NMDS2
+)
+
+plot_NMDS_tex_data <- merge(
+  plot_NMDS_tex_data,
+  group_tex_centroids,
+  by = "Treatment"
+)
+
+names(plot_NMDS_tex_data)[4:5] <- c("xend", "yend")
+
+#Plot the data
+
+ggplot(plot_NMDS_tex_data, aes(NMDS1,NMDS2)) + 
+  geom_point(aes(color = Treatment),size=2)+ 
+  stat_ellipse(geom = "polygon", alpha = 0.04, aes(group = Treatment), 
+               color = "black",fill="blue")+ 
+  geom_point(data = group_tex_centroids, aes(x = Centroid_X, y = Centroid_Y), 
+             color = "black", size = 2, shape = 7)+
+  geom_segment(data = plot_NMDS_tex_data, aes(x =NMDS1, y = NMDS2, 
+                                     xend = xend, yend = yend, color = Treatment), alpha = 0.5)+
+  scale_color_manual(name= "Treatment",labels= unique(plot_NMDS_tex_data$Treatment),
+                     values= c("darkolivegreen", "darkviolet","darkorange1"))+ theme_bw()
+
+##############PERMANOVA##############################
+
+
+#Distance Matrix
+
+perm_tex_dist<-vegdist(perm_tex_dat, method='bray')
+
+#Assumptions
+
+dispersion<-betadisper(perm_tex_dist, group=tex_dat$Treatment,type = "centroid")
+
+plot(dispersion)
+
+anova(dispersion)
+
+#Test
+
+perma_tex_result<-adonis2( perm_tex_dist~as.factor(plot_NMDS_tex_data$Treatment), data=perm_tex_dist,
+                       permutations=9999)
+
+perma_tex_result
+
+################################
+################################
+###repeat PERMANOVA and NMDS for fine sediments only
+#Create new dataframe
+
+perm_finetex_dat<-tex_dat[, c(16)]
+
+#Run NMDS Model for Visualizing the composition
+set.seed(321)
+nmds_fine_result<-metaMDS (perm_tex_dat, distance = "bray")
 
 #Extract NMDS Scores 
 nmds_scores <-as.data.frame(scores(nmds_result)$sites)
@@ -159,7 +242,7 @@ nmds_scores <-as.data.frame(scores(nmds_result)$sites)
 group_centroids <- data.frame(
   Treatment = c("h", "l","c"),
   Centroid_X = c(mean(nmds_scores$NMDS1[tex_dat$Treatment == "h"]),
-                mean(nmds_scores$NMDS1[tex_dat$Treatment == "l"]),
+                 mean(nmds_scores$NMDS1[tex_dat$Treatment == "l"]),
                  mean(nmds_scores$NMDS1[tex_dat$Treatment == "c"])),
   
   Centroid_Y = c(mean(nmds_scores$NMDS2[tex_dat$Treatment == "h"]),
@@ -169,10 +252,10 @@ group_centroids <- data.frame(
 ###Create data frame for ggplot
 
 #plot_NMDS_tex_data<-data.frame(Treatment = tex_dat$Treatment,
-  #NMDS1=nmds_scores$NMDS1,
-  #NMDS2=nmds_scores$NMDS2,
-  #xend=c(rep(group_centroids[1,2],10),rep(group_centroids[2,2],10)),
-  #yend=c(rep(group_centroids[1,3],10),rep( group_centroids[2,3],10)))
+#NMDS1=nmds_scores$NMDS1,
+#NMDS2=nmds_scores$NMDS2,
+#xend=c(rep(group_centroids[1,2],10),rep(group_centroids[2,2],10)),
+#yend=c(rep(group_centroids[1,3],10),rep( group_centroids[2,3],10)))
 
 plot_NMDS_tex_data <- data.frame(
   Treatment = tex_dat$Treatment,
@@ -197,28 +280,6 @@ ggplot(plot_NMDS_tex_data, aes(NMDS1,NMDS2)) +
   geom_point(data = group_centroids, aes(x = Centroid_X, y = Centroid_Y), 
              color = "black", size = 2, shape = 7)+
   geom_segment(data = plot_NMDS_tex_data, aes(x =NMDS1, y = NMDS2, 
-                                     xend = xend, yend = yend, color = Treatment), alpha = 0.5)+
+                                              xend = xend, yend = yend, color = Treatment), alpha = 0.5)+
   scale_color_manual(name= "Treatment",labels= unique(plot_NMDS_tex_data$Treatment),
                      values= c("darkolivegreen", "darkviolet","darkorange1"))+ theme_bw()
-
-##############PERMANOVA##############################
-
-
-#Distance Matrix
-
-perm_tex_dist<-vegdist(perm_tex_dat, method='bray')
-
-#Assumptions
-
-dispersion<-betadisper(perm_tex_dist, group=tex_dat$Treatment,type = "centroid")
-
-plot(dispersion)
-
-anova(dispersion)
-
-#Test
-
-perma_result<-adonis2( perm_tex_dist~as.factor(plot_NMDS_tex_data$Treatment), data=perm_tex_dist,
-                       permutations=9999)
-
-perma_result
