@@ -245,3 +245,91 @@ perma_tex_result
 
 tex_el_dat<-read.csv('/Users/joe/Desktop/R_projects/CH3_Patchconfig/patchconfiguration_effects_env/data/Marchionno_TCTN_Texture.csv')
 
+perm_tex_el_dat<-tex_el_dat[, c(3,5,7,9,10,11,12)]
+
+#Run NMDS Model for Visualizing the composition
+
+set.seed(999) #Pr 0.2747
+#set.seed(888) #Pr 
+#set.seed(777) #Pr 
+#set.seed(666) #Pr 
+#set.seed(555) #Pr 
+#set.seed(444) #Pr 
+#set.seed(333) #Pr 
+#set.seed(222) #Pr 
+#set.seed(111) #Pr 
+#set.seed(001) #Pr 
+
+#Transform
+
+perm_tex_el_dat_trans<-sqrt(perm_tex_el_dat)
+
+nmds_tex_el_result<-metaMDS (perm_tex_el_dat_trans, distance = "bray")
+
+#Extract NMDS Scores 
+nmds_tex_el_scores <-as.data.frame(scores(nmds_tex_el_result)$sites)
+
+#Find out the centroids
+
+group_tex_el_centroids <- data.frame(
+  Treatment = c("h", "l","c"),
+  Centroid_X = c(mean(nmds_tex_el_scores$NMDS1[tex_el_dat$Treatment == "h"]),
+                 mean(nmds_tex_el_scores$NMDS1[tex_el_dat$Treatment == "l"]),
+                 mean(nmds_tex_el_scores$NMDS1[tex_el_dat$Treatment == "c"])),
+  
+  Centroid_Y = c(mean(nmds_tex_el_scores$NMDS2[tex_el_dat$Treatment == "h"]),
+                 mean(nmds_tex_el_scores$NMDS2[tex_el_dat$Treatment == "l"]),
+                 mean(nmds_tex_el_scores$NMDS2[tex_el_dat$Treatment == "c"])))
+
+###Create data frame for ggplot
+
+plot_NMDS_tex_el_data <- data.frame(
+  Treatment = tex_el_dat$Treatment,
+  NMDS1 = nmds_tex_el_scores$NMDS1,
+  NMDS2 = nmds_tex_el_scores$NMDS2
+)
+
+plot_NMDS_tex_el_data <- merge(
+  plot_NMDS_tex_el_data,
+  group_tex_el_centroids,
+  by = "Treatment"
+)
+
+names(plot_NMDS_tex_el_data)[4:5] <- c("xend", "yend")
+
+#Plot the data
+
+ggplot(plot_NMDS_tex_el_data, aes(NMDS1,NMDS2)) + 
+  geom_point(aes(color = Treatment),size=2)+ 
+  stat_ellipse(geom = "polygon", alpha = 0.04, aes(group = Treatment), 
+               color = "black",fill="blue")+ 
+  geom_point(data = group_tex_el_centroids, aes(x = Centroid_X, y = Centroid_Y), 
+             color = "black", size = 2, shape = 7)+
+  geom_segment(data = plot_NMDS_tex_el_data, aes(x =NMDS1, y = NMDS2, 
+                                              xend = xend, yend = yend, color = Treatment), alpha = 0.5)+
+  scale_color_manual(name= "Treatment",labels= unique(plot_NMDS_tex_el_data$Treatment),
+                     values= c("darkgoldenrod", "darkblue","darkseagreen3"))+ theme_bw()
+
+##############PERMANOVA##############################
+
+
+#Distance Matrix
+
+perm_tex_el_dist<-vegdist(perm_tex_el_dat, method='bray')
+
+#Assumptions
+
+dispersion_el<-betadisper(perm_tex_el_dist, group=tex_el_dat$Treatment,type = "centroid")
+
+plot(dispersion_el)
+
+anova(dispersion_el)
+
+#Test
+
+perma_tex_el_result<-adonis2( perm_tex_el_dist~as.factor(plot_NMDS_tex_el_data$Treatment), data=perm_tex_el_dist,
+                           permutations=9999)
+
+perma_tex_el_result
+
+
