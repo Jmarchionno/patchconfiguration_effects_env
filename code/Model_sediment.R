@@ -142,6 +142,20 @@ ggplot(oyster_dat, aes(x=treatment,y=percent.cover)) +
   ylab("percent cover")+
   stat_compare_means()
 
+## ANOVA treatment vs elevation 
+
+treatment_elevationNA_dat<-read.csv('/Users/joe/Desktop/R_projects/CH3_Patchconfig/patchconfiguration_effects_env/data/oyster_latlong_elevation_tex_element_NAremoved.csv')
+
+ggplot(treatment_elevationNA_dat, aes(x=treatment,y=elevation..m.NAVD.)) +
+  geom_boxplot(outlier.shape = NA)+
+  geom_jitter()+
+  theme_minimal()+
+  ylab("elevation (m)")+
+  stat_compare_means()
+
+aov_treatment_elevation <- aov(treatment_elevationNA_dat$elevation..m.NAVD. ~ treatment_elevationNA_dat$treatment)
+summary(aov_treatment_elevation)
+
 ################################
 ################################
 ###PERMANOVA and NMDS for texture
@@ -245,7 +259,7 @@ perma_tex_result
 
 tex_el_dat<-read.csv('/Users/joe/Desktop/R_projects/CH3_Patchconfig/patchconfiguration_effects_env/data/Marchionno_TCTN_Texture.csv')
 
-perm_tex_el_dat<-tex_el_dat[, c(3,5,7,9,10,11,12)]
+perm_tex_el_dat<-tex_el_dat[, c(6,9,10,11,12)]
 
 #Run NMDS Model for Visualizing the composition
 
